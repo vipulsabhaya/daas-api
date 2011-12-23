@@ -1,0 +1,68 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+	<display-name>Archetype Created Web Application</display-name>
+	<listener>
+    	<listener-class>com.hpcloud.daas.listener.DaaSServletContextListener</listener-class>
+    </listener>
+	<servlet>
+		<servlet-name>CXFServlet</servlet-name>
+		<display-name>CXF Servlet</display-name>
+		<servlet-class>
+			org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet
+		</servlet-class>
+		<init-param>
+			<param-name>jaxrs.serviceClasses</param-name>
+			<param-value>
+				com.hpcloud.daas.listener.DBaaS com.hpcloud.daas.listener.MockDBaaS
+			</param-value>
+		</init-param>
+		<init-param>
+			<param-name>jaxrs.providers</param-name>
+			<param-value>
+				org.apache.cxf.jaxrs.provider.JSONProvider
+			</param-value>
+		</init-param>
+		<!-- enables schema validation -->
+		<!-- <init-param> <param-name>jaxrs.schemaLocations</param-name> <param-value> 
+			classpath:/WEB-INF/schemas/schema1.xsd classpath:/WEB-INF/schemas/schema2.xsd 
+			</param-value> </init-param> -->
+		<!-- registers CXF in interceptors -->
+		<init-param>
+			<param-name>jaxrs.inInterceptors</param-name>
+			<param-value>
+				org.apache.cxf.interceptor.LoggingInInterceptor
+			</param-value>
+		</init-param>
+		<!-- registers CXF out interceptors -->
+		<init-param>
+			<param-name>jaxrs.outInterceptors</param-name>
+			<param-value>
+				org.apache.cxf.interceptor.LoggingOutInterceptor
+			</param-value>
+		</init-param>
+		<!-- registers extension mappings -->
+		<init-param>
+			<param-name>jaxrs.extensions</param-name>
+			<param-value>
+				xml=application/xml
+				json=application/json
+			</param-value>
+		</init-param>
+		<!-- registers contextual properties -->
+		<init-param>
+			<param-name>jaxrs.properties</param-name>
+			<param-value>
+				property1=value
+				property2=value
+			</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>CXFServlet</servlet-name>
+		<url-pattern>/*</url-pattern>
+	</servlet-mapping>
+</web-app>

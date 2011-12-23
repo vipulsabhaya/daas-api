@@ -1,0 +1,100 @@
+#!/bin/bash
+set -x
+set -e
+
+echo "deb http://apt.opscode.com/ `lsb_release -cs`-0.10 main" | sudo tee /etc/apt/sources.list.d/opscode.list
+
+wget -qO - http://apt.opscode.com/packages@opscode.com.gpg.key | sudo apt-key add -
+
+export PRESEED_FILE=/tmp/tmp_chef_preseed
+cat > $PRESEED_FILE <<DELIM
+chef chef/chef_server_url string http://10.6.36.3:4000
+DELIM
+sudo debconf-set-selections $PRESEED_FILE
+rm -f $PRESEED_FILE
+
+sudo apt-get -y -q update
+
+sudo apt-get -y -q install chef
+
+if [ ! -f "/etc/chef/validation.pem" ]; then
+echo "-----BEGIN RSA PRIVATE KEY-----
+MIIEogIBAAKCAQEAxATpP+bp146LPzsJpq7Rn+ZKswnwYM81zSvQT5ldwJjWq4VN
+Q4F2i5AdD4BDjdd2O+qdx/hCaWOh0tLEqOpvC4wRlw9tc52yKKhoCLer9VruMCWC
+IseEIYxPAZuVnZRdJiWVWfRg0iYHquqFeWsdzb2wh8XSSDZSKpW3L04G59PcTz4S
+ncvEs8Q7yGy7FreSttP93cCAU7adjQzwa87US5hNNsyE1/guIiQIMOoMOM0orVKF
+5nGpYDBxDma6B9zTaRBfD+K7Orm0DshM/x3Mt2pM+wghSgmZe4t1m29tdLmnOOAv
+idPvhzHKxmHmXM7SJkxE9yqSlAXcts9EWT0/TQIDAQABAoIBABBqGN4xCAP0+9Qf
+rX83xHYPYtH7UxXIREkaEieYQDGQmuliEEZG4RZuywAxTXbjRBNgYjYMpAMPRM3S
+uIUsnH/rCs4LjK7R1clx0MRqHQw+wRNnEK645meoyDTqQm0fr20yWH9f53uxk5LM
+cMDqJ2TDLbUw65sAcYD/aIedkRZ4kb16zMlQiP8meOOE/IDNrCjajJ8CsN8rPfpb
+qIWushc+QlILU+1vpzE7dElfJbdtEmCSuHUQy2ldDXpy7Yk9+hx9pwMHirjU+jsD
+H5D0rIfAZ1y6XVYs/FpITytSSYv+0BDvvr49V5UTs+JNPwC7C7OmQ5KwazQz4u8+
+2Kfh8gECgYEA6Y74dmFX0A1QJKsONSp+y1dudU5pMXBCKfCNRptPyk7NM4wbG2jM
+m2btcMgI4cutH6Yq8yRsg4PPRgl1l/ud9RA2MAuuEAS0DKtimoEjhQUtDsnCX61h
+UV7FMeHGnPmwCOp+SrooP+JYbtbmQi3tQN/4ARVYHdjHrOMgsJoN4pkCgYEA1tqO
+RjabZ5qJXA9Jn8Zt6WaMFqr9AS5FkHU9GnOch9g0ovtovJ4GChteoyBSp4Hknamf
+ULcjuelrTEFgtsBTnC3ypmbKyopf0e5XxPXxcOmc0Vu79RXU8fFEtEFtoAwv3cIT
+ipifeQwQ6vSnnY9wSa95PvyBM5U4oSB5N6GVJtUCgYARF4FfSGhgtVi0FkCH64Az
+6UYQF5jjIU/2OcBc9mi0aWfi6dHiA51Vkga2Ri1AOOOGeWaTPIskZLT6bx7H7IX2
+tSUCBxjJ205Bzxj8LY8n4OUXO/SZg9qnVcQgjmE2g586R87OMSlY43uNQPTAyxOd
+t8YybhlwtbiHEmgGBIAXoQKBgC/XULDfvfDu30Epgkpag+Th2bW+c0HNDN5izK1U
+Kvmwsd/MvYCqa0va1lLagq0b5k0ZFQmDDih6ilLbh+6JmtR/ArX805EQCNAVE2Qf
+I5jx2+JeW9bx+o25HIRKwV9O92WYroNBAtmQT0ASJDSYWPd/ZC8bSKW0x3xRX8x8
+ZVrVAoGAGvqkfC9x90jzLVnuqbWYvK5LDsFuPFudRfYq8IhV3ZZ32rR/puzS6vn9
+8HWVlg+dMDB8J2O9xlxJlzHYMurc4YRFJMjKquLAsu+P70ubH8GOoVV68HGhDwpW
+YdmPsn2nnv6GNw6MXlw0VEkKY68HUdo/+Tp0rNJgog/E/a1TZf4=
+-----END RSA PRIVATE KEY-----" | sudo tee "/etc/chef/validation.pem"
+fi
+
+if [ ! -f "/root/.chef/demo.pem" ]; then
+sudo mkdir -p /root/.chef
+echo "-----BEGIN RSA PRIVATE KEY-----
+MIIEpAIBAAKCAQEA9sMM1ETz59eG5QC7Tb61cyqjevRxlds9toYQQ5WOfy9NVW+a
+TfDjUlElKbU1Ygy8d3F4+0pYndglv62fIc640jg+1mKV+pweG4bJwipK0jcipE4u
+kWCqs+igwKmVrg3cQ0xGj8LXFuSimlxhzyMkqYwe5D3UhgqY9YKr9T4XdBdsObHI
+QwKCj7P9xxohjhz8cGZTM360d0g2ik8emjf9j3Uk/c6P4RFVGbBedQA+f7/Eabvz
+4RRllrulJe9mF8lt3PyshAsT8yV14yxtSNiAb/bmRIGsPI61Xf83d/b1F0EswH5S
+vCchdcUhIAYN/zLKjaWMrUAxAnFcE1e7RGVUOwIDAQABAoIBADYzU48Qci57ZbLJ
+PVrvR7W7KNtp88UBugVsXwgpQnpnLmpUsCTsg1HiZvJJTidyOrdVokg35U0OXARF
+I43udSQfnJXEY8L/JZHQQmK2nWadG6vRTGM8Q2Ju91g6J5lqi/XwPBN5rXrmz1xu
+bEFuK7BeCa8Ccbrbewt6H0En2UjzKbWDXllWiKgPsMEE68CL6a4uWW1/R5v+sDjE
+itElx1fFyXOd2s7bj0877XcYX8/bUvIHb9pNL+shTFe1709llxy1fCU0nT9qP82F
+dSotGpazWfUZFq0Ydp1RhEXmGvZtQw0b/0t9WeHGFYPdycKXAVAlJC9I96q/3NiP
+8zNJT9kCgYEA/BPm3uM5DyE2wcVZFkBbvH+3D0V9NXoHaS0e+ZNzA7U7DKngeai5
+owYLR6xHVFAysqXcIehkzhOPLeAJsVTFmMJ7gkGdVdedIqb8F2t2UR61XRikEjVH
+R1KK/y1DtVl2PbLDznLGuu7iJgdSdi2E8zWJxtSYjEEkfBeVpVYhz4cCgYEA+pn5
+S2wdAADPNDRxsju+5fOi4HwNLZ9v/zjcEcorPiabUN+nMUG+ZRyIWwC+oAXGLVwL
+dtDHK2Fcz+PrqdGZfj3LikfSTYROhf6duubkpu+NUb+htZcc94lPBeuVuudQcnz7
+78y8MdSxKbD66dBrqzgyLLyWzZMEW/Kje9Qcuq0CgYEAveu8uVeXKOgMWmf23AX3
+WAkdgjsHwB/Fr5+YQ8+tCzEjYUIoZ2ERJFusaf7J6yNVXzYJqd5u/LjN2nF+vAWz
+rolxBs2q3f9KW85WBssnZKzvVkn3a+SKZJkzMlkHN35E0O18C3J8emD7ME25+mIH
+VjqTKKQKnzmBZKFcVSqU5McCgYEA6VBhYW8OsOoP/7K0CBTH7p+ejRHx0wAV7bCq
+c4WeLQcUo38W0i07bjfaW5+d2q6Fi8WehshqJmFHX+X7iuex2G8ACYZErhb4ZJhh
+kZlWWHW/RNT9YWuHdI9KG2Dyzkh+BZmHlgMvU9WJ/B7h/L4nAAoZ7LzISi0OaezF
+eIxLEyECgYAh8HqW18uyslKmutc1Hv5RyKBqSKwH4BHzQV3Xn8WwGssnkVd+NE8J
+UYusOSQrwBo7FifTsbPwRtCVi+sgVWA0398g3Of7BXuHgx4MT/5AV8pnzrVwP87n
+a6EEd9pn/2uLenhEDxdTdsTtj7Fn40YUgHRIdIQ7K647MMWMqgWJRg==
+-----END RSA PRIVATE KEY-----" | sudo tee "/root/.chef/demo.pem"
+fi
+
+if [ ! -f "/root/.chef/knife.rb" ]; then
+echo "log_level                :info
+log_location             STDOUT
+node_name                'demo'
+client_key               '/root/.chef/demo.pem'
+validation_client_name   'chef-validator'
+validation_key           '/etc/chef/validation.pem'
+chef_server_url          'http://10.6.36.3:4000'
+cache_type               'BasicFile'
+cache_options( :path => '/root/.chef/checksums' )
+cookbook_path           '/root/chef-repo/cookbooks'" | sudo tee "/root/.chef/knife.rb"
+fi
+
+sudo chef-client
+
+host=$(hostname).novalocal
+sudo knife node run_list add $host 'role[database]'
+
+sudo chef-client
+

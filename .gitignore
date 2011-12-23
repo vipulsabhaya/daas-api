@@ -1,0 +1,15 @@
+#OSX specific
+.DS_Store
+._*
+.Trashes
+*~
+
+#Eclipse specific
+.project
+.metadata
+.settings/
+.classpath
+bin/**
+
+#Maven build targets
+target/
